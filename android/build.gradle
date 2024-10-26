@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0' // 必要に応じて適切なバージョンに変更
+        classpath 'com.google.gms:google-services:4.3.14' // 最新安定版
+    }
+}
+
 allprojects {
     repositories {
         google()
