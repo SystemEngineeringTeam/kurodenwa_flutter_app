@@ -13,7 +13,6 @@ final FirebaseMethods firebaseMethods = FirebaseMethods();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint('aaaaaaaaaaaaaaa:');
   runApp(MyApp());
 }
 
@@ -23,6 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       //App名(アプリ名)
       title: '目覚まし黒電話',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -308,17 +308,73 @@ class _NewAlarmEntryPageState extends State<NewAlarmEntryPage> {
               items: const [
                 DropdownMenuItem(
                     child: Padding(
-                        child: Text("デフォルト音"),
+                        child: Text("ボイスを選択"),
                         padding:
                             EdgeInsets.symmetric(vertical: 0, horizontal: 16)),
                     value: 'default'),
                 DropdownMenuItem(
-                  value: 'ずんだもん',
-                  child: Text('ずんだもん'),
+                  value: '1',
+                  child: Text('voice1:うまみ'),
                 ),
                 DropdownMenuItem(
-                  value: 'ゆっくりれいむ',
-                  child: Text('ゆっくりれいむ'),
+                  value: '2',
+                  child: Text('voice2:うまみ'),
+                ),
+                DropdownMenuItem(
+                  value: '3',
+                  child: Text('voice3:うまみ'),
+                ),
+                DropdownMenuItem(
+                  value: '4',
+                  child: Text('voice4:うまみ'),
+                ),
+                DropdownMenuItem(
+                  value: '5',
+                  child: Text('voice5:コッシー'),
+                ),
+                DropdownMenuItem(
+                  value: '6',
+                  child: Text('voice6:コッシー'),
+                ),
+                DropdownMenuItem(
+                  value: '7',
+                  child: Text('voice7:コッシー'),
+                ),
+                DropdownMenuItem(
+                  value: '8',
+                  child: Text('voice8:コッシー'),
+                ),
+                DropdownMenuItem(
+                  value: '9',
+                  child: Text('voice9:メロンぱん'),
+                ),
+                DropdownMenuItem(
+                  value: '10',
+                  child: Text('voice10:メロンぱん'),
+                ),
+                DropdownMenuItem(
+                  value: '11',
+                  child: Text('voice11:メロンぱん'),
+                ),
+                DropdownMenuItem(
+                  value: '12',
+                  child: Text('voice12:メロンぱん'),
+                ),
+                DropdownMenuItem(
+                  value: '13',
+                  child: Text('voice13:ちっぴー'),
+                ),
+                DropdownMenuItem(
+                  value: '14',
+                  child: Text('voice14:ちっぴー'),
+                ),
+                DropdownMenuItem(
+                  value: '15',
+                  child: Text('voice15:ちっぴー'),
+                ),
+                DropdownMenuItem(
+                  value: '16',
+                  child: Text('voice16:ちっぴー'),
                 )
               ],
               value: sound,
@@ -331,32 +387,40 @@ class _NewAlarmEntryPageState extends State<NewAlarmEntryPage> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  // 曜日をリストに変換
-                  List<int> weekDays = [];
-                  if (sunChk) weekDays.add(0);
-                  if (monChk) weekDays.add(1);
-                  if (tueChk) weekDays.add(2);
-                  if (wedChk) weekDays.add(3);
-                  if (thuChk) weekDays.add(4);
-                  if (friChk) weekDays.add(5);
-                  if (satChk) weekDays.add(6);
+                  // soundがdefaultでない場合のみ保存
+                  if (sound != 'default') {
+                    // 曜日をリストに変換
+                    List<int> weekDays = [];
+                    if (sunChk) weekDays.add(0);
+                    if (monChk) weekDays.add(1);
+                    if (tueChk) weekDays.add(2);
+                    if (wedChk) weekDays.add(3);
+                    if (thuChk) weekDays.add(4);
+                    if (friChk) weekDays.add(5);
+                    if (satChk) weekDays.add(6);
 
-                  // アラームデータをFirebaseに保存
-                  String formattedTime = DateFormat("H:mm").format(dateTime);
-                  debugPrint("$formattedTime $sound ${weekDays.join(',')}");
-                  firebaseMethods.set(
-                    formattedTime, // 時間のフォーマット
-                    true, // 初期状態はアクティブ
-                    sound,
-                    weekDays.join(','), // リストをカンマ区切りの文字列に変換
-                  );
+                    // アラームデータをFirebaseに保存
+                    String formattedTime = DateFormat("H:mm").format(dateTime);
+                    debugPrint("$formattedTime $sound ${weekDays.join(',')}");
+                    firebaseMethods.set(
+                      formattedTime, // 時間のフォーマット
+                      true, // 初期状態はアクティブ
+                      sound,
+                      weekDays.join(','), // リストをカンマ区切りの文字列に変換
+                    );
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('登録しました')),
-                  );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('登録しました')),
+                    );
 
-                  // 登録完了後にトップページに戻る
-                  Navigator.pop(context, true); // 成功を示すためにtrueを渡す
+                    // 登録完了後にトップページに戻る
+                    Navigator.pop(context, true); // 成功を示すためにtrueを渡す
+                  } else {
+                    // エラーメッセージを表示
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('ボイスを選択してください')),
+                    );
+                  }
                 }
               },
               child: const Text("保存"),
