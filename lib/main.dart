@@ -139,33 +139,66 @@ class _TopPageState extends State<TopPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   elevation: 4,
-                  child: ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  child:ListTile(
+                    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     title: Text(
                       '時間: ${alarm.time}',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
                       '繰り返し: ${alarm.days.map((day) => _dayLabel(day)).join(", ")}',
                       style: TextStyle(fontSize: 14),
                     ),
-                    trailing: Switch(
-                      value: alarm.isActive,
-                      activeColor: Colors.deepPurple,
-                      onChanged: (bool value) {
-                        setState(() {
-                          alarmList[index] = Alarm(
-                            id: alarm.id,
-                            isActive: value,
-                            time: alarm.time,
-                            days: alarm.days,
-                            repeat: alarm.repeat,
-                          );
-                        });
-                        firebaseMethods.update(alarmList[index]);
-                      },
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min, // 必須: 横幅を内容に合わせる
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.black),
+                          onPressed: () async {
+                            final shouldDelete = await showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('確認'),
+                                  content: Text('このアラームを削除しますか？'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false), // キャンセル
+                                      child: Text('キャンセル'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, true), // 削除
+                                      child: Text('削除', style: TextStyle(color: Colors.red)),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (shouldDelete == true) {
+                              await firebaseMethods.delete(alarm.id); // Firebaseから削除
+                              setState(() {
+                                alarmList.removeAt(index); // リストを更新して即座に反映
+                              });
+                            }
+                          },
+                        ),
+                        Switch(
+                          value: alarm.isActive,
+                          onChanged: (bool value) {
+                            setState(() {
+                              alarmList[index] = Alarm(
+                                id: alarm.id,
+                                isActive: value,
+                                time: alarm.time,
+                                days: alarm.days,
+                                repeat: alarm.repeat,
+                              );
+                            });
+                            firebaseMethods.update(alarmList[index]);
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -447,6 +480,18 @@ class FirebaseMethods {
       });
     } catch (e) {
       debugPrint('Error creating Alarm from data: $e');
+    }
+  }
+//消す処理
+  Future<void> delete(String alarmId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('alarms')
+          .doc(alarmId)
+          .delete();
+      debugPrint('Alarm deleted: $alarmId');
+    } catch (e) {
+      debugPrint('Error deleting Alarm: $e');
     }
   }
 
