@@ -176,9 +176,9 @@ class _TopPageState extends State<TopPage> {
                             );
 
                             if (shouldDelete == true) {
-                              await firebaseMethods.delete(alarm.id); // 削除処理
+                              await firebaseMethods.delete(alarm.id); // Firebaseから削除
                               setState(() {
-                                alarmList.removeAt(index); // リストを更新
+                                alarmList.removeAt(index); // リストを更新して即座に反映
                               });
                             }
                           },
